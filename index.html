@@ -61,17 +61,26 @@
   <div class="log" id="log"></div>
 
   <script>
-    let coins = 100;
-    let items = 0;
+    let coins = parseInt(localStorage.getItem("coins")) || 100;
+    let items = parseInt(localStorage.getItem("items")) || 0;
+    let lastBonus = localStorage.getItem("lastBonus") || "";
 
     const coinsEl = document.getElementById("coins");
     const itemsEl = document.getElementById("items");
     const logEl = document.getElementById("log");
+    const bonusBtn = document.getElementById("bonusBtn");
 
     function log(message) {
       const p = document.createElement("p");
       p.textContent = message;
       logEl.prepend(p);
+    }
+
+    function update() {
+      coinsEl.textContent = coins;
+      itemsEl.textContent = items;
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("items", items);
     }
 
     document.getElementById("buyBtn").onclick = function() {
@@ -96,17 +105,24 @@
       update();
     };
 
-    document.getElementById("bonusBtn").onclick = function() {
+    bonusBtn.onclick = function() {
+      const today = new Date().toDateString();
+
+      if (lastBonus === today) {
+        log("Bonus harian sudah kamu ambil hari ini ⚠️");
+        return;
+      }
+
       const bonus = Math.floor(Math.random() * 51) + 50;
       coins += bonus;
+      lastBonus = today;
+      localStorage.setItem("lastBonus", today);
+
       log("Kamu mendapat bonus harian: +" + bonus + " koin ⚡");
       update();
     };
 
-    function update() {
-      coinsEl.textContent = coins;
-      itemsEl.textContent = items;
-    }
+    update();
   </script>
 </body>
 </html>
