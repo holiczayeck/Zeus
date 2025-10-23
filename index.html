@@ -1,175 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>⚡ Zeus Tycoon v2 ⚡</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #2b2b2b, #000);
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 { color: #fcd703; }
-    .stats { font-size: 18px; margin: 20px 0; }
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      background-color: #fcd703;
-      color: #000;
-      font-weight: bold;
-      margin: 5px;
-      cursor: pointer;
-    }
-    button:hover { background-color: #ffee75; }
-    .log {
-      background: rgba(255,255,255,0.1);
-      padding: 10px;
-      margin-top: 20px;
-      border-radius: 10px;
-      height: 120px;
-      overflow-y: auto;
-      text-align: left;
-    }
-    .admin-panel {
-      display: none;
-      margin-top: 30px;
-      background: rgba(255,255,255,0.1);
-      padding: 15px;
-      border-radius: 10px;
-    }
-    input {
-      padding: 5px;
-      border-radius: 5px;
-      border: none;
-      margin: 5px;
-    }
-  </style>
-</head>
-<body>
-  <h1>⚡ Zeus Tycoon ⚡</h1>
+<!-- Tambahkan di dalam <head> atau sebelum script game -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-  <div>
-    <label>Nama Pemain:</label>
-    <input type="text" id="playerName" placeholder="Masukkan nama...">
-    <button id="saveName">Simpan</button>
-  </div>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDJsak8lJC07Is68FYhdDzMYt_GzrzSShU",
+    authDomain: "zeus-tycoon.firebaseapp.com",
+    projectId: "zeus-tycoon",
+    storageBucket: "zeus-tycoon.firebasestorage.app",
+    messagingSenderId: "40932626813",
+    appId: "1:40932626813:web:2a6d718af064ee3c227c14"
+  };
 
-  <div class="stats">
-    <p>Nama: <span id="showName">-</span></p>
-    <p>Koin: <span id="coins">0</span></p>
-    <p>Barang: <span id="items">0</span></p>
-  </div>
+  // Inisialisasi Firebase dan Firestore
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-  <button id="buyBtn">Beli Barang (50 koin)</button>
-  <button id="sellBtn">Jual Barang (70 koin)</button>
-  <button id="bonusBtn">Bonus Harian ⚡</button>
-  <button id="adminBtn">Panel Admin 🛠️</button>
+  // Fungsi simpan data pendaftaran
+  async function daftarAkun() {
+    const nama = document.getElementById("nama").value;
+    const email = document.getElementById("email").value;
+    const hp = document.getElementById("hp").value;
+    const rekening = document.getElementById("rekening").value;
 
-  <div class="admin-panel" id="adminPanel">
-    <h3>Panel Admin</h3>
-    <input type="password" id="adminPass" placeholder="Password admin"><br>
-    <input type="text" id="targetName" placeholder="Nama pemain">
-    <input type="number" id="addCoins" placeholder="Jumlah koin"><br>
-    <button id="giveCoins">Tambahkan Koin</button>
-  </div>
-
-  <div class="log" id="log"></div>
-
-  <script>
-    // ==== Data dasar ====
-    let data = JSON.parse(localStorage.getItem("zeusData")) || {};
-    let player = data.player || { name: "", coins: 100, items: 0, lastBonus: "" };
-
-    const coinsEl = document.getElementById("coins");
-    const itemsEl = document.getElementById("items");
-    const nameEl = document.getElementById("showName");
-    const logEl = document.getElementById("log");
-
-    const ADMIN_PASSWORD = "ZEUS123"; // 🧙‍♂️ Ganti ini sesuka kamu!
-
-    function log(msg) {
-      const p = document.createElement("p");
-      p.textContent = msg;
-      logEl.prepend(p);
+    if (!nama || !email || !hp || !rekening) {
+      alert("Semua data wajib diisi!");
+      return;
     }
 
-    function save() {
-      data.player = player;
-      localStorage.setItem("zeusData", JSON.stringify(data));
-    }
+    await addDoc(collection(db, "users"), {
+      nama: nama,
+      email: email,
+      hp: hp,
+      rekening: rekening,
+      koin: 0,
+      tanggalDaftar: new Date().toISOString()
+    });
 
-    function update() {
-      coinsEl.textContent = player.coins;
-      itemsEl.textContent = player.items;
-      nameEl.textContent = player.name || "-";
-      save();
-    }
+    alert("Akun berhasil didaftarkan!");
+    document.getElementById("form-daftar").reset();
+  }
 
-    document.getElementById("saveName").onclick = () => {
-      const nameInput = document.getElementById("playerName").value.trim();
-      if (!nameInput) return alert("Masukkan nama dulu!");
-      player.name = nameInput;
-      log("Nama disimpan: " + player.name);
-      update();
-    };
-
-    document.getElementById("buyBtn").onclick = () => {
-      if (player.coins >= 50) {
-        player.coins -= 50;
-        player.items++;
-        log("Kamu membeli 1 barang 🔥");
-      } else log("Koin tidak cukup!");
-      update();
-    };
-
-    document.getElementById("sellBtn").onclick = () => {
-      if (player.items > 0) {
-        player.coins += 70;
-        player.items--;
-        log("Kamu menjual 1 barang 💰");
-      } else log("Belum ada barang untuk dijual!");
-      update();
-    };
-
-    document.getElementById("bonusBtn").onclick = () => {
-      const today = new Date().toDateString();
-      if (player.lastBonus === today) {
-        log("Bonus harian sudah diambil ⚠️");
-        return;
-      }
-      const bonus = Math.floor(Math.random() * 51) + 50;
-      player.coins += bonus;
-      player.lastBonus = today;
-      log("Kamu dapat bonus harian +" + bonus + " ⚡");
-      update();
-    };
-
-    document.getElementById("adminBtn").onclick = () => {
-      const panel = document.getElementById("adminPanel");
-      panel.style.display = panel.style.display === "none" ? "block" : "none";
-    };
-
-    document.getElementById("giveCoins").onclick = () => {
-      const pass = document.getElementById("adminPass").value;
-      const target = document.getElementById("targetName").value.trim();
-      const amount = parseInt(document.getElementById("addCoins").value);
-
-      if (pass !== ADMIN_PASSWORD) return alert("Password salah!");
-      if (!target || isNaN(amount)) return alert("Isi semua kolom dengan benar!");
-
-      if (player.name === target) {
-        player.coins += amount;
-        log(`Admin menambahkan ${amount} koin ke ${target}`);
-        update();
-      } else {
-        log(`Tidak ditemukan pemain bernama "${target}" di perangkat ini.`);
-      }
-    };
-
-    update();
-  </script>
-</body>
-</html>
+  window.daftarAkun = daftarAkun;
+</script>
