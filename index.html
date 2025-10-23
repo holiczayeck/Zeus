@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Zeus Tycoon</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; background: linear-gradient(#fff, #dbe2ff); margin-top: 50px; }
+    button { padding: 10px 20px; font-size: 18px; margin: 10px; border-radius: 10px; border: none; background: #4b5bff; color: white; }
+    button:hover { background: #3a49cc; }
+    .stats { font-size: 22px; margin: 10px; }
+  </style>
+</head>
+<body>
+  <h1>⚡ Zeus Tycoon ⚡</h1>
+  <div class="stats">Koin: <span id="coins">0</span></div>
+  <button id="sellBtn">Jual Barang</button>
+  <button id="upgradeBtn">Upgrade Pegawai (100 koin)</button>
+
+  <script>
+    let coins = parseInt(localStorage.getItem("coins")) || 0;
+    let income = parseInt(localStorage.getItem("income")) || 10;
+
+    const coinsEl = document.getElementById("coins");
+    const sellBtn = document.getElementById("sellBtn");
+    const upgradeBtn = document.getElementById("upgradeBtn");
+
+    function updateDisplay() {
+      coinsEl.textContent = coins;
+    }
+
+    sellBtn.onclick = () => {
+      coins += income;
+      updateDisplay();
+      localStorage.setItem("coins", coins);
+    };
+
+    upgradeBtn.onclick = () => {
+      if (coins >= 100) {
+        coins -= 100;
+        income += 5;
+        updateDisplay();
+        localStorage.setItem("coins", coins);
+        localStorage.setItem("income", income);
+        alert("Upgrade berhasil! ⚡ Pegawai makin produktif!");
+      } else {
+        alert("Koin kamu belum cukup!");
+      }
+    };
+
+    updateDisplay();
+  </script>
+</body>
+</html>
