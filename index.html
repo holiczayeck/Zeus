@@ -1,53 +1,112 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Zeus Tycoon</title>
+  <meta charset="UTF-8">
+  <title>⚡ Zeus Tycoon ⚡</title>
   <style>
-    body { font-family: sans-serif; text-align: center; background: linear-gradient(#fff, #dbe2ff); margin-top: 50px; }
-    button { padding: 10px 20px; font-size: 18px; margin: 10px; border-radius: 10px; border: none; background: #4b5bff; color: white; }
-    button:hover { background: #3a49cc; }
-    .stats { font-size: 22px; margin: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #2b2b2b, #000);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #fcd703;
+    }
+
+    .stats {
+      font-size: 20px;
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background-color: #fcd703;
+      color: #000;
+      font-weight: bold;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ffea61;
+    }
+
+    .log {
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 10px;
+      height: 120px;
+      overflow-y: auto;
+      text-align: left;
+    }
   </style>
 </head>
 <body>
   <h1>⚡ Zeus Tycoon ⚡</h1>
-  <div class="stats">Koin: <span id="coins">0</span></div>
-  <button id="sellBtn">Jual Barang</button>
-  <button id="upgradeBtn">Upgrade Pegawai (100 koin)</button>
+  <div class="stats">
+    <p>Koin: <span id="coins">100</span></p>
+    <p>Barang: <span id="items">0</span></p>
+  </div>
+
+  <button id="buyBtn">Beli Barang (50 koin)</button>
+  <button id="sellBtn">Jual Barang (70 koin)</button>
+  <button id="bonusBtn">Bonus Harian ⚡</button>
+
+  <div class="log" id="log"></div>
 
   <script>
-    let coins = parseInt(localStorage.getItem("coins")) || 0;
-    let income = parseInt(localStorage.getItem("income")) || 10;
+    let coins = 100;
+    let items = 0;
 
     const coinsEl = document.getElementById("coins");
-    const sellBtn = document.getElementById("sellBtn");
-    const upgradeBtn = document.getElementById("upgradeBtn");
+    const itemsEl = document.getElementById("items");
+    const logEl = document.getElementById("log");
 
-    function updateDisplay() {
-      coinsEl.textContent = coins;
+    function log(message) {
+      const p = document.createElement("p");
+      p.textContent = message;
+      logEl.prepend(p);
     }
 
-    sellBtn.onclick = () => {
-      coins += income;
-      updateDisplay();
-      localStorage.setItem("coins", coins);
-    };
-
-    upgradeBtn.onclick = () => {
-      if (coins >= 100) {
-        coins -= 100;
-        income += 5;
-        updateDisplay();
-        localStorage.setItem("coins", coins);
-        localStorage.setItem("income", income);
-        alert("Upgrade berhasil! ⚡ Pegawai makin produktif!");
+    document.getElementById("buyBtn").onclick = function() {
+      if (coins >= 50) {
+        coins -= 50;
+        items++;
+        log("Kamu membeli 1 barang 🔥");
       } else {
-        alert("Koin kamu belum cukup!");
+        log("Koin kamu tidak cukup!");
       }
+      update();
     };
 
-    updateDisplay();
+    document.getElementById("sellBtn").onclick = function() {
+      if (items > 0) {
+        coins += 70;
+        items--;
+        log("Kamu menjual 1 barang 💰");
+      } else {
+        log("Kamu belum punya barang untuk dijual!");
+      }
+      update();
+    };
+
+    document.getElementById("bonusBtn").onclick = function() {
+      const bonus = Math.floor(Math.random() * 51) + 50;
+      coins += bonus;
+      log("Kamu mendapat bonus harian: +" + bonus + " koin ⚡");
+      update();
+    };
+
+    function update() {
+      coinsEl.textContent = coins;
+      itemsEl.textContent = items;
+    }
   </script>
 </body>
 </html>
