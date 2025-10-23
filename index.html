@@ -1,45 +1,57 @@
-<!-- Tambahkan di dalam <head> atau sebelum script game -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zeus Tycoon</title>
+</head>
+<body>
+  <h1>Daftar Akun Zeus Tycoon</h1>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDJsak8lJC07Is68FYhdDzMYt_GzrzSShU",
-    authDomain: "zeus-tycoon.firebaseapp.com",
-    projectId: "zeus-tycoon",
-    storageBucket: "zeus-tycoon.firebasestorage.app",
-    messagingSenderId: "40932626813",
-    appId: "1:40932626813:web:2a6d718af064ee3c227c14"
-  };
+  <form id="form-daftar" onsubmit="event.preventDefault(); daftarAkun();">
+    <input type="text" id="nama" placeholder="Nama Akun" required><br>
+    <input type="email" id="email" placeholder="Email" required><br>
+    <input type="tel" id="hp" placeholder="Nomor HP" required><br>
+    <input type="text" id="rekening" placeholder="Nomor Rekening / E-Wallet" required><br>
+    <button type="submit">Daftar</button>
+  </form>
 
-  // Inisialisasi Firebase dan Firestore
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-  // Fungsi simpan data pendaftaran
-  async function daftarAkun() {
-    const nama = document.getElementById("nama").value;
-    const email = document.getElementById("email").value;
-    const hp = document.getElementById("hp").value;
-    const rekening = document.getElementById("rekening").value;
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJsak8lJC07Is68FYhdDzMYt_GzrzSShU",
+      authDomain: "zeus-tycoon.firebaseapp.com",
+      projectId: "zeus-tycoon",
+      storageBucket: "zeus-tycoon.firebasestorage.app",
+      messagingSenderId: "40932626813",
+      appId: "1:40932626813:web:2a6d718af064ee3c227c14"
+    };
 
-    if (!nama || !email || !hp || !rekening) {
-      alert("Semua data wajib diisi!");
-      return;
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function daftarAkun() {
+      const nama = document.getElementById("nama").value;
+      const email = document.getElementById("email").value;
+      const hp = document.getElementById("hp").value;
+      const rekening = document.getElementById("rekening").value;
+
+      if (!nama || !email || !hp || !rekening) {
+        alert("Semua data wajib diisi!");
+        return;
+      }
+
+      await addDoc(collection(db, "users"), {
+        nama, email, hp, rekening, koin: 0, tanggalDaftar: new Date().toISOString()
+      });
+
+      alert("✅ Akun berhasil didaftarkan!");
+      document.getElementById("form-daftar").reset();
     }
 
-    await addDoc(collection(db, "users"), {
-      nama: nama,
-      email: email,
-      hp: hp,
-      rekening: rekening,
-      koin: 0,
-      tanggalDaftar: new Date().toISOString()
-    });
-
-    alert("Akun berhasil didaftarkan!");
-    document.getElementById("form-daftar").reset();
-  }
-
-  window.daftarAkun = daftarAkun;
-</script>
+    window.daftarAkun = daftarAkun;
+  </script>
+</body>
+</html>
